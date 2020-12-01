@@ -193,7 +193,7 @@ func (this *iniParser) load(r io.Reader) error {
 		}
 
 		var sectionName = getSectionName(sLine)
-		if len(sectionName) > 0 && strings.ToLower(sectionName) != kDefaultSection {
+		if len(sectionName) > 0 && sectionName != kDefaultSection {
 			currentSection = this.newSection(sectionName)
 			currentSection.comments = append(currentSection.comments, comments...)
 			comments = nil
@@ -201,7 +201,7 @@ func (this *iniParser) load(r io.Reader) error {
 		}
 
 		if currentSection == nil {
-			currentSection = this.newSection(strings.ToLower(kDefaultSection))
+			currentSection = this.newSection(kDefaultSection)
 		}
 
 		var optName, optIV, optValue = getOptionAndValue(sLine)
@@ -349,7 +349,10 @@ func (this *iniParser) RemoveSection(section string) {
 	this.Lock()
 	defer this.Unlock()
 
-	if strings.ToLower(section) == kDefaultSection {
+	//if strings.ToLower(section) == kDefaultSection {
+	//	return
+	//}
+	if section == kDefaultSection {
 		return
 	}
 	delete(this.sections, section)
