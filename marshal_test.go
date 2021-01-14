@@ -66,3 +66,17 @@ func TestUnmarshal(t *testing.T) {
 
 	//t.Log(tc.Default.DK1, tc.Default.Dk2)
 }
+
+func TestUnmarshalSection(t *testing.T) {
+	var ini = New(false)
+	if err := ini.LoadFiles("./marshal.conf"); err != nil {
+		t.Fatal(err)
+	}
+
+	var d *Default
+	if err := ini.UnmarshalSection("Default", &d); err != nil {
+		t.Fatal(err)
+	}
+
+	fmt.Println(d)
+}

@@ -18,6 +18,11 @@ func (this *Ini) Unmarshal(v interface{}) error {
 	return unmarshal(this, v)
 }
 
+func (this *Ini) UnmarshalSection(section string, v interface{}) error {
+	var ns = this.Section(section)
+	return UnmarshalSection(ns, v)
+}
+
 func Unmarshal(data []byte, v interface{}) error {
 	var ini = New(false)
 	if err := ini.load(bytes.NewReader(data)); err != nil {
@@ -91,6 +96,43 @@ func unmarshalSections(objType reflect.Type, objValue reflect.Value, ini *Ini) e
 		}
 	}
 	return nil
+}
+
+func UnmarshalSection(section *Section, v interface{}) error {
+	if section == nil {
+		return fmt.Errorf("section not exists")
+	}
+
+	var vType = reflect.TypeOf(v)
+	var vValue = reflect.ValueOf(v)
+	var vValueKind = vValue.Kind()
+
+	if vValueKind == reflect.Struct {
+		return errors.New("v argument is struct")
+	}
+
+	if vValue.IsNil() {
+		return errors.New("v argument is nil")
+	}
+
+	for {
+		if vValueKind == reflect.Ptr && vValue.IsNil() {
+			vValue.Set(reflect.New(vType.Elem()))
+		}
+
+		if vValueKind == reflect.Ptr {
+			vValue = vValue.Elem()
+			vType = vType.Elem()
+			vValueKind = vValue.Kind()
+			continue
+		}
+		break
+	}
+	return unmarshalSection(vType, vValue, section)
+}
+
+func unmarshalSection(objType reflect.Type, objValue reflect.Value, section *Section) error {
+	return unmarshalOptions(objType, objValue, section)
 }
 
 func unmarshalOptions(objType reflect.Type, objValue reflect.Value, section *Section) error {
