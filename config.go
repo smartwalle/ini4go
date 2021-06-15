@@ -230,6 +230,7 @@ func (this *iniParser) WriteToFile(file string) error {
 	}
 
 	f.Truncate(0)
+	f.Seek(0, 0)
 
 	err = this.writeTo(f)
 	f.Close()
